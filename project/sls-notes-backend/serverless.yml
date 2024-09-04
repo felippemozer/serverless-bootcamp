@@ -1,0 +1,44 @@
+service: sls-notes-backend
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1
+  stage: ${sls:stage}
+  memorySize: 128
+  timeout: 5
+  endpointType: REGIONAL
+  environment:
+    NOTES_TABLE: ${self:service}-${sls:stage}
+
+resources:
+  Resources:
+    NotesTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:provider.environment.NOTES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+          - AttributeName: note_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - KeySchema:
+              - AttributeName: note_id
+                KeyType: HASH
+            IndexName: note_id-index
+            Projection:
+              ProjectionType: ALL
+              
