@@ -4,6 +4,10 @@ const getResponseHeaders = () => {
     }
 };
 
+const getIdToken = (headers) => {
+    return headers.Authorization;
+}
+
 const getUserId = (headers) => {
     return headers.app_user_id;
 };
@@ -13,6 +17,7 @@ const getUserName = (headers) => {
 };
 
 module.exports = {
+    getIdToken,
     getResponseHeaders,
     getUserId,
     getUserName
